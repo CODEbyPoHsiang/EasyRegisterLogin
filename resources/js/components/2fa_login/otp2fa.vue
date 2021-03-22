@@ -115,7 +115,10 @@ export default {
       // localStorage.removeItem("google2fa_secret");
       // localStorage.removeItem("email");
       sessionStorage.clear();
-      this.$router.push("/login");
+
+      this.$router.push({"/login"});
+      this.email = "";
+      this.password = "";
     },
   },
   mounted() {

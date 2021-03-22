@@ -9,7 +9,7 @@
     <nav class="navbar navbar-expand-lg navbar-primary  bg-primary ">
       <div class="collapse navbar-collapse">
         <!-- for logged-in user-->
-        <div class="navbar-nav" v-if="isLoggedIn === 'true'">
+        <div class="navbar-nav" v-if="isLoggedIn === 'true'" >
           <router-link to="/allproduct" class="nav-item nav-link"
             >產品清單</router-link
           >
@@ -40,7 +40,7 @@
       </div>
     </nav>
     <br />
-    <router-view @singin="singin" />
+    <router-view     @singin="singin" />
   </div>
 </template>
 

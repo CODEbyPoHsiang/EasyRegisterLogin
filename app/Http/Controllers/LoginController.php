@@ -35,13 +35,19 @@ class LoginController extends Controller
         // 刪除掉之前留存的login-token(舊)資料
         $user->tokens()->where('name', '=', 'login-token')->delete();
         // 如果登入者未設置二次驗證，則執行獲取google二次驗證key及掃QR_CODE
-        if ($user["google2fa_enable"] == "") {
+        if ($user["google2fa_secret"] == "") {
             //產生google2fa的key
-            $google2fa = app('pragmarx.google2fa');
-            $user["google2fa_secret"] =  ($google2fa->generateSecretKey(32));
-            
+            //寫法 1
+            // $google2fa = app('pragmarx.google2fa');
+            // $user["google2fa_secret"] =  ($google2fa->generateSecretKey(32));
+
+            //寫法 2
+            $user["google2fa_secret"] =  Google2FA::generateSecretKey(64);
             //生成QR code
-            $QR_Image = $google2fa->getQRCodeInline(
+            // 寫法 1
+            // $QR_Image = $google2fa->getQRCodeInline(
+            // 寫法2
+            $QR_Image = Google2FA::getQRCodeInline(
             // config('app.name'),
                 $user['email'],
                 "TestMonitor",
@@ -72,12 +78,9 @@ class LoginController extends Controller
     }
 
     // Google2FA，6位OTP碼驗證
-    public function checkGoogle2faOTP(Request $request)
+    public function checkGoogle2faOTP1(Request $request)
     {
         $user = User::where('name', $request->name)->orWhere('email', $request->email)->first();
-        
-        
-
 
         //執行GOOGLE2FA的安全碼驗證
         $google2fa_otp = $request->one_time_password;
@@ -88,9 +91,9 @@ class LoginController extends Controller
             'success' => "optempty",
             'message' => '請填入二次驗證碼',
           ];
-
             return response()->json($response, 202);
         }
+
         //驗證資料庫內的google密碼跟二次驗證的驗證碼
         $login_2fa_status = Google2FA::verifyKey($google_2fa_secrect, $google2fa_otp);
         //驗證2次驗證的6位驗證碼是否正確
@@ -103,16 +106,61 @@ class LoginController extends Controller
         }
         // 通過驗證後，才獲取登入後的 login-token
         $token = $user->createToken('login-token')->plainTextToken;
-        //記錄登入時間
-        // $user->login_time = Carbon::now()->timezone('Asia/Taipei');
-        // $user->updated_at = Carbon::now()->timezone('Asia/Taipei');
         $user->google2fa_enable ="true";
         $user->google2fa_secret = $google_2fa_secrect;
         $user->save();
+
         $response = [
         'success' => true,
         'name' => $user["name"],
-        // 'role' => $user["role"],
+        'google2fa_secret' => $google_2fa_secrect,
+        '2fa_login_status' => $login_2fa_status,
+        'login_token' => $token,
+        'message' => '二次驗證登入成功',
+      ];
+        return response($response, 200);
+    }
+    // Google2FA，6位OTP碼驗證
+    public function checkGoogle2faOTP(Request $request)
+    {
+        $user = User::where('name', $request->name)->orWhere('email', $request->email)->first();
+
+        $google2fa_otp = $request->one_time_password;
+
+        if ($user["google2fa_secret"] === "") {
+            //執行GOOGLE2FA的安全碼驗證
+            $google_2fa_secrect = $request->google2fa_secret;
+            $user->google2fa_secret = $google_2fa_secrect;
+        } else {
+            $google_2fa_secrect = $user->google2fa_secret;
+        }
+
+        //驗證碼不得為空
+        if ($google2fa_otp === null) {
+            $response = [
+            'success' => "optempty",
+            'message' => '請填入二次驗證碼',
+          ];
+            return response()->json($response, 202);
+        }
+
+        //驗證資料庫內的google密碼跟二次驗證的驗證碼
+        $login_2fa_status = Google2FA::verifyKey($google_2fa_secrect, $google2fa_otp);
+        //驗證2次驗證的6位驗證碼是否正確
+        if ($login_2fa_status === false) {
+            $response = [
+            'success' => false,
+            'message' => '二次驗證碼輸入錯誤或逾時，請重新操作',
+          ];
+            return response()->json($response, 202);
+        }
+        // 通過驗證後，才獲取登入後的 login-token
+        $token = $user->createToken('login-token')->plainTextToken;
+        $user->save();
+
+        $response = [
+        'success' => true,
+        'name' => $user["name"],
         'google2fa_secret' => $google_2fa_secrect,
         '2fa_login_status' => $login_2fa_status,
         'login_token' => $token,

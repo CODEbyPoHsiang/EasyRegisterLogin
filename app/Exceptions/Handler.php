@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class Handler extends ExceptionHandler
 {
@@ -40,6 +41,13 @@ class Handler extends ExceptionHandler
                 'success' => false,
                 'data' => [],
                 'message' => "路由清單中找不到此Controller"], 202);
+        });
+        $this->renderable(function (ThrottleRequestsException $e, $request) {
+            return response()->json($response = [
+                'success' => false,
+                'data' => [],
+                'message' => "請求過多",
+            ], 429);
         });
     }
 }

@@ -261,6 +261,8 @@ export default {
       this.getcode = "false";
       this.otp = "false";
       this.first_login = "true";
+      this.email = "";
+      this.password = "";
       this.$router.push("/login");
     },
   },
