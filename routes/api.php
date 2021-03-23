@@ -40,5 +40,5 @@ Route::post("/google2fa_login", 'LoginController@checkGoogle2faOTP');
     Route::get('/guzzle/{id}', 'GuzzleController@guzzleShow');
     Route::patch('/guzzle/{id}', 'GuzzleController@guzzlePatch');
     Route::delete('/guzzle/{id}', 'GuzzleController@guzzleDestroy');
-    Route::post('/search', 'ProductController@search');
+    Route::post('/guzzle_search', 'GuzzleController@guzzleSearch');
 // });

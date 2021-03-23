@@ -10,8 +10,8 @@ class GuzzleController extends Controller
     public function guzzleGet()
     {
         //使用guzzle
-        $client = new \GuzzleHttp\Client();
-        $request = $client->get('http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products');
+        $client = new Client();
+        $request = $client->get("http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products");
         $response = $request->getBody();
 
         //使用curl
@@ -44,15 +44,15 @@ class GuzzleController extends Controller
     {
         $name = $request->name;
         $detail = $request->detail;
-
+        
         //使用guzzle
-        $client = new \GuzzleHttp\Client();
+        $client = new Client();
         $response = $client->post('http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products', [
-            'form_params' => [
+            'json' => [
                 'name' => $name,
                 'detail' => $detail,
             ],
-        ])->getBody();
+        ])->getBody()->getContents();
 
         //使用curl
         // $curl = curl_init();
@@ -81,7 +81,7 @@ class GuzzleController extends Controller
     public function guzzleShow($id)
     {
         //使用 guzzle
-        $client = new \GuzzleHttp\Client();
+        $client = new Client();
         $request = $client->get("http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products/$id");
         $response = $request->getBody();
 
@@ -99,7 +99,7 @@ class GuzzleController extends Controller
         // ));
         // $response = curl_exec($curl);
         // curl_close($curl);
-        
+
         return $response;
     }
 
@@ -109,7 +109,7 @@ class GuzzleController extends Controller
         $detail = $request->detail;
         
         //使用 guzzle
-        $client = new \GuzzleHttp\Client();
+        $client = new Client();
         $response = $client->patch("http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products/$id", [
             'form_params' => [
                 'name' => $name,
@@ -117,7 +117,7 @@ class GuzzleController extends Controller
             ],
         ])->getBody();
 
-
+       
         //使用 curl
         // $curl = curl_init();
 
@@ -146,7 +146,7 @@ class GuzzleController extends Controller
     public function guzzleDestroy($id)
     {
         //使用guzzle
-        $client = new \GuzzleHttp\Client();
+        $client = new Client();
         $request = $client->delete("http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/products/$id");
         $response = $request->getBody();
 
@@ -167,6 +167,42 @@ class GuzzleController extends Controller
         // $response = curl_exec($curl);
         // curl_close($curl);
 
+
+        return $response;
+    }
+    public function guzzleSearch(Request $request)
+    {
+        $keywords = $request->keywords;
+        //使用guzzle
+        $client = new Client();
+        $response = $client->post('http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/search', [
+            'json' => [
+                'keywords' => $keywords,
+            ],
+        ])->getBody()->getContents();
+
+
+        // //使用 curl
+        // $curl = curl_init();
+
+        // curl_setopt_array($curl, array(
+        //   CURLOPT_URL => 'http://10.249.33.229/~po-hsiang/EasyRegisterLogin/public/api/search',
+        //   CURLOPT_RETURNTRANSFER => true,
+        //   CURLOPT_ENCODING => '',
+        //   CURLOPT_MAXREDIRS => 10,
+        //   CURLOPT_TIMEOUT => 0,
+        //   CURLOPT_FOLLOWLOCATION => true,
+        //   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //   CURLOPT_CUSTOMREQUEST => 'POST',
+        //   CURLOPT_POSTFIELDS => "keywords=$keywords",
+        //   CURLOPT_HTTPHEADER => array(
+        //     'Content-Type: application/x-www-form-urlencoded'
+        //   ),
+        // ));
+        
+        // $response = curl_exec($curl);
+        
+        // curl_close($curl);
 
         return $response;
     }

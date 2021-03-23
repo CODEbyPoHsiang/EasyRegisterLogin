@@ -48,53 +48,64 @@ class ProductController extends Controller
        
         $product->save();
 
-        return response()->json('Product created!');
+        return response()->json(['success'=>true,'data'=>$product,'message'=>'Product created!'], 200);
     }
 
     public function show($id)
     {
         $product = Product::find($id);
-        return response()->json($product);
+        if ($product) {
+            return response()->json(['success'=>true,'data'=>$product,'message'=>'Product get data ok!'], 200);
+        } else {
+            return response()->json(['success'=>false,'message'=>'Error get data!'], 200);
+        }
     }
 
     public function update($id, Request $request)
     {
         $product = Product::find($id);
-
-        $rules = [
+        if ($product) {
+            $rules = [
             //填入須符合的格式及長度
             'detail' => 'required|numeric',
      
         ];
-        $messages = [
+            $messages = [
             //驗證未通過的訊息提示
             'detail.required' => '價格欄位不得為空',
             'detail.numeric' => '填入格式應為【數字】',
         ];
-        $validator = Validator::make($request->all(), $rules, $messages);
-        if ($validator->fails()) {
-            $messages = $validator->messages();
-            $errors = $messages->all();
-            $response = [
+            $validator = Validator::make($request->all(), $rules, $messages);
+            if ($validator->fails()) {
+                $messages = $validator->messages();
+                $errors = $messages->all();
+                $response = [
                 'success' => false,
                 'data' => "Error",
                 'message' => $errors[0],
             ];
-            return response()->json($response, 202);
-        }
+                return response()->json($response, 202);
+            }
 
        
-        $product->update($request->all());
+            $product->update($request->all());
 
-        return response()->json('Product updated!', 200);
+            return response()->json(['success'=>true,'data'=>$product,'message'=>'Product updated!'], 200);
+        } else {
+            return response()->json(['success'=>false,'message'=>'Error product updated !'], 200);
+        }
     }
 
     public function destroy($id)
     {
         $product = Product::find($id);
-        $product->delete();
+        if ($product) {
+            $product->delete();
 
-        return response()->json('Product deleted!');
+            return response()->json(['success'=>true,'message'=>'Product deleted!'], 200);
+        } else {
+            return response()->json(['success'=>false,'message'=>'Error product deleted!'], 200);
+        }
     }
 
     public function search(Request $request)
