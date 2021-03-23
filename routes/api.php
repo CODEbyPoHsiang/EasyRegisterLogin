@@ -37,8 +37,8 @@ Route::post("/google2fa_login", 'LoginController@checkGoogle2faOTP');
 // Route::middleware('auth:sanctum')->group(function () {
     Route::get('/guzzle', 'GuzzleController@guzzleGet');
     Route::post('/guzzle', 'GuzzleController@guzzlePost');
-    Route::get('/products/{id}', 'ProductController@show');
-    Route::patch('/products/{id}', 'ProductController@update');
-    Route::delete('/products/{id}', 'ProductController@destroy');
+    Route::get('/guzzle/{id}', 'GuzzleController@guzzleShow');
+    Route::patch('/guzzle/{id}', 'GuzzleController@guzzlePatch');
+    Route::delete('/guzzle/{id}', 'GuzzleController@guzzleDestroy');
     Route::post('/search', 'ProductController@search');
 // });
